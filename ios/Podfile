@@ -37,4 +37,8 @@ target 'FinSight' do
       # :ccache_enabled => true
     )
   end
+  pod 'RNScreens', :path => '../node_modules/react-native-screens'
+  pod 'RNCAsyncStorage', :path => '../node_modules/@react-native-async-storage/async-storage'
+
+
 end

@@ -68,9 +68,10 @@ const themeColor = {
       shadowOffset: {width: 3, height: 3},
       shadowRadius: 5,
       shadowOpacity: 0.1,
-      ...generateBoxShadowStyle(0, 3, 'black', 0.1, 5, 5, 'black'),
+      ...generateBoxShadowStyle(0, 3, 'black', 0.1, 5, 10, 'black'),
     },
-
+    //6374042418
+    //7641967
     spinnerContainer: {
       flex: 1,
       justifyContent: 'center',

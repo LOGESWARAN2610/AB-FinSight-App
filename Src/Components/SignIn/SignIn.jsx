@@ -61,8 +61,8 @@ const LogInPage = props => {
   const [userDetails, setUserDetails] = useState({
     staySignedIn: !true,
     autoDirect: false,
-    userName: 'LogesNew@abt.com',
-    password: 'Cool@111',
+    userName: '', //'LogesNew@abt.com',
+    password: '', // 'Cool@111',
   });
   const [errors, setErrors] = useState({});
   const scrollViewRef = useRef(null),
@@ -137,6 +137,8 @@ const LogInPage = props => {
     iUserDetails['Path'] = 'Home';
     if (iUserDetails) {
       // navigation.navigate("Home");
+      iUserDetails['isAuthenticated'] = true;
+
       setContextDetails(prevContentDetails => {
         return {...prevContentDetails, ...iUserDetails};
       });
@@ -157,7 +159,7 @@ const LogInPage = props => {
         emailId,
       }).then(function (response) {
         const {status} = response['data'];
-        handleNextAction({autoDirect: true});
+        handleNextAction({...userDetails, userName: emailId, autoDirect: true});
       });
     } else {
       error('Password not matching.');
@@ -191,13 +193,14 @@ const LogInPage = props => {
       firstName = '',
       lastName = '',
       phoneNumber = '',
-      userName: emailId = '',
+      userName = '',
+      emailId = '',
     } = userDetails;
     handleAPI('signUp', {
       firstName,
       lastName,
       phoneNumber,
-      emailId,
+      emailId: userName || emailId,
     }).then(function (response) {
       const {OTP} = response.data;
       setUserDetails(prevUserDetails => {

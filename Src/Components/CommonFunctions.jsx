@@ -5,9 +5,8 @@ import {NODE_URI} from '@env';
 const {log, error} = console;
 const handleAPI = async (name, params) => {
   try {
-    console.log(`${NODE_URI}/${name}`);
-
-    const response = await axios.post(`${NODE_URI}/${name}`, params || {});
+    const iNodeUri = __DEV__ ? NODE_URI : NODE_URI_PROD;
+    const response = await axios.post(`${iNodeUri}/${name}`, params || {});
     return response;
   } catch (err) {
     return error(`Error from ${name} ===> `, err);

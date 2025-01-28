@@ -1,11 +1,12 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {android, ios, web} from './Accessories/Platform';
 import axios from 'axios';
-import {NODE_URI} from '@env';
+import {NODE_URI, NODE_URI_PROD} from '@env';
 const {log, error} = console;
 const handleAPI = async (name, params) => {
   try {
     const iNodeUri = __DEV__ ? NODE_URI : NODE_URI_PROD;
+    console.log('Calling API', iNodeUri + '/' + name);
     const response = await axios.post(`${iNodeUri}/${name}`, params || {});
     return response;
   } catch (err) {

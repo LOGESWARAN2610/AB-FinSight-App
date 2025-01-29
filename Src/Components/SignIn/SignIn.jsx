@@ -260,7 +260,6 @@ const LogInPage = props => {
 
   return (
     <View style={{backgroundColor: 'white', flex: 1}}>
-      {/* <SocketTest /> */}
       <View style={[Styles.loginContainer]}>
         <View style={Styles.loginTitleContainer}>
           <Image

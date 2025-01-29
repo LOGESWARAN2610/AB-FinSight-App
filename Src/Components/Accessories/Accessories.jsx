@@ -9,10 +9,10 @@ import {
   Alert,
 } from 'react-native';
 import DateTimePicker from 'react-native-ui-datepicker';
-
+import {request, PERMISSIONS, RESULTS} from 'react-native-permissions';
 import CustomTextInput from './CustomTextInput';
 // import { REDIRECT_URL } from "@env";
-import {android, web} from './Platform';
+import {android, ios, web} from './Platform';
 import Styles from '../../Styles/Style';
 import useKeyboardHeight from './KeyboardHeight';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
@@ -60,6 +60,7 @@ const InputBox = props => {
         style={[
           Styles.inputBox,
           isValid && {borderWidth: 1, borderColor: 'red'},
+          secureTextEntry && {color: 'black'},
         ]}
         autoCapitalize={'none'}
         ref={ref || null}
@@ -186,20 +187,38 @@ const DrawerView = props => {
   );
 };
 //======================================================
+const requestCameraPermission = async () => {
+  const permission = ios ? PERMISSIONS.IOS.CAMERA : PERMISSIONS.ANDROID.CAMERA;
+
+  const result = await request(permission);
+
+  if (result === RESULTS.GRANTED) {
+    return true;
+  } else {
+    Alert.alert(
+      'Permission Required',
+      'Camera access is needed to take photos.',
+    );
+    return false;
+  }
+};
 const scanDocument = async isPickFile => {
   try {
-    const {status} = await launchCamera();
     let result;
-    if (status !== 'granted') {
-      console.error('Sorry, we need camera permissions to make this work!');
+    // if (!status) {
+    //   console.error('Sorry, we need camera permissions to make this work!');
+    // } else {
+    if (isPickFile) {
+      result = await launchImageLibrary({
+        allowsEditing: true,
+        quality: 1,
+        base64: true,
+      });
+      result = result['assets'];
     } else {
-      if (isPickFile) {
-        result = await launchImageLibrary({
-          allowsEditing: true,
-          quality: 1,
-          base64: true,
-        });
-        result = result['assets'];
+      const status = await requestCameraPermission();
+      if (!status) {
+        console.error('Sorry, we need camera permissions to make this work!');
       } else {
         try {
           const {scannedImages} = await DocumentScanner.scanDocument({
@@ -215,6 +234,7 @@ const scanDocument = async isPickFile => {
         }
       }
     }
+
     return result;
   } catch (error) {
     Alert.alert('Error form launchCamera', error.message);

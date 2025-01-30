@@ -373,7 +373,7 @@ const Home = props => {
                     }}>
                     {isSelected &&
                       settlementStatus === 'Not Paid' &&
-                      isAdmin && (
+                      (isAdmin || isSuperAdmin) && (
                         <View
                           style={{
                             position: 'absolute',

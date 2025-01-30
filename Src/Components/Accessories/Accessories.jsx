@@ -259,19 +259,20 @@ const Divider = () => {
 //======================================================
 const TextLink = ({text, onPress = () => {}, style = {}}) => {
   return (
-    <Text
-      style={{
-        ...{
-          color: Styles.themeColor.color,
-          fontSize: 12,
-          alignSelf: 'center',
-          fontWeight: 'bold',
-        },
-        ...style,
-      }}
-      onPress={onPress}>
-      {text}
-    </Text>
+    <TouchableOpacity activeOpacity={0.7} onPress={onPress}>
+      <Text
+        style={{
+          ...{
+            color: Styles.themeColor.color,
+            fontSize: 12,
+            alignSelf: 'center',
+            fontWeight: 'bold',
+          },
+          ...style,
+        }}>
+        {text}
+      </Text>
+    </TouchableOpacity>
   );
 };
 //======================================================

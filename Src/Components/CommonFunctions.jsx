@@ -6,7 +6,7 @@ const {log, error} = console;
 const handleAPI = async (name, params) => {
   try {
     let iNodeUri = __DEV__ ? NODE_URI : NODE_URI_PROD;
-    iNodeUri = 'http://localhost:4440';
+    // iNodeUri = 'http://localhost:4440';
     console.log('Calling API', iNodeUri + '/' + name);
     const response = await axios.post(`${iNodeUri}/${name}`, params || {});
     return response;

@@ -57,7 +57,7 @@ const Transaction = props => {
   return (
     <View
       style={{
-        paddingHorizontal: 20,
+        paddingHorizontal: 10,
         backgroundColor: '#fff',
         flex: 1,
       }}>

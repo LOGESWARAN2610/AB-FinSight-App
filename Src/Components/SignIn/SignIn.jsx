@@ -64,13 +64,12 @@ const FooterContent = ({leftContent = <></>, rightContent = <></>}) => {
 };
 
 const LogInPage = props => {
-  const {navigation} = props;
-  const {contextDetails, setContextDetails} = useContext(UserContext); //Get value from context
+  const {setContextDetails} = useContext(UserContext); //Get value from context
   const [userDetails, setUserDetails] = useState({
     staySignedIn: !true,
     autoDirect: false,
-    userName: '', //'LogesNew@abt.com',
-    password: '', // 'Cool@111',
+    userName: __DEV__ ? 'LogesNew@abt.com' : '',
+    password: __DEV__ ? 'Cool@111' : '',
     staySignedIn: true,
   });
   const [errors, setErrors] = useState({});
@@ -98,12 +97,6 @@ const LogInPage = props => {
   ]);
   const [headerText, setHeaderText] = useState('Sign In Now!');
 
-  const handleSliderPage = event => {
-    const {x} = event.nativeEvent.contentOffset,
-      indexOfNextScreen = Math.round(x / width);
-
-    setIndex(indexOfNextScreen);
-  };
   useEffect(() => {
     scrollViewRef.current.scrollTo({
       animated: true,
@@ -112,15 +105,6 @@ const LogInPage = props => {
     });
   }, [index]);
 
-  const handleClearState = () => {
-    setUserDetails({
-      staySignedIn: true,
-      autoDirect: false,
-      userName: '',
-      password: '',
-    });
-    setIndex(0);
-  };
   useEffect(() => {
     const prePare = async () => {
       // AsyncStorage.removeItem('logInDetails');
@@ -264,6 +248,7 @@ const LogInPage = props => {
               lastName = '',
               emailId: userName = '',
               isAdmin = false,
+              isSuperAdmin = false,
               _id: userId,
             } = response.data,
             Name = `${firstName} ${lastName}`.trim(),
@@ -276,6 +261,7 @@ const LogInPage = props => {
               staySignedIn: true,
               userId,
               isAdmin,
+              isSuperAdmin,
               Path: 'Home',
             };
 
@@ -364,6 +350,8 @@ const LogInPage = props => {
                     flexDirection: 'row',
                     alignSelf: 'flex-end',
                     marginTop: 10,
+                    // display: 'flex',
+                    alignItems: 'flex-end',
                   }}>
                   <TextLink
                     text="Remember Me"

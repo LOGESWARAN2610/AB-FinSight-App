@@ -18,18 +18,15 @@ const themeColor = {
     safeAreaView: {
       flex: 1,
       backgroundColor: '#fff',
-      paddingTop: android ? StatusBar.currentHeight + 5 : 0,
+      // paddingTop: StatusBar.currentHeight + 20,
       justifyContent: 'center',
     },
 
     loginContainer: {
       top: 50,
       padding: 10,
-      // marginHorizontal: 30,
       borderRadius: 5,
       backgroundColor: 'white',
-      // margin: 10,
-      maxWidth: 485,
     },
     loginTitleContainer: {
       marginBottom: 10,

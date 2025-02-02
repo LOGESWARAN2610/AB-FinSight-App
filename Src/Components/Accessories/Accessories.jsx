@@ -212,7 +212,7 @@ const scanDocument = async isPickFile => {
       result = await launchImageLibrary({
         allowsEditing: true,
         quality: 1,
-        base64: true,
+        includeBase64: true,
       });
       result = result['assets'];
     } else {

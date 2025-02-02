@@ -1,26 +1,86 @@
-import React, {useEffect, useState} from 'react';
-import {SafeAreaView, Text, View} from 'react-native';
+import React, {useContext, useRef, useState} from 'react';
+import {Image, Text, TouchableOpacity, View} from 'react-native';
+import {SafeAreaView} from 'react-native-safe-area-context';
 import {NavigationContainer} from '@react-navigation/native';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import Styles from './Src/Styles/Style';
 import SignIn from './Src/Components/SignIn/SignIn';
-// import SignIn from './Components/Js/SignIn/SignIn';
-// import Home from './Components/Js/Home/Home';
 import Home from './Src/Components/Home/Home';
 import DashBoard from './Src/Components/Dashboard/DashBoard';
 import Transaction from './Src/Components/Transaction/Transaction';
-// import Transaction from './Components/Js/Transaction/Transaction';
-// import DashBoard from './Components/Js/Dashboard/DashBoard';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {UserContext} from './Src/Components/Accessories/Accessories';
-
+import {Menu, MenuItem} from 'react-native-material-menu';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 const Bar = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
+
+const MenuButton = () => {
+  const {contextDetails, setContextDetails} = useContext(UserContext);
+  const [menuVisible, setMenuVisible] = useState(false),
+    menuRef = useRef(null),
+    showMenu = () => {
+      setMenuVisible(true);
+      menuRef.current.show();
+    },
+    hideMenu = () => {
+      setMenuVisible(false);
+      menuRef.current.hide();
+    },
+    toggleMenu = () => {
+      menuVisible ? hideMenu() : showMenu();
+    };
+
+  return (
+    <View>
+      <Menu
+        style={{
+          borderRadius: 5,
+          marginTop: 45,
+          borderWidth: 1,
+          borderColor: '#999',
+        }}
+        ref={menuRef}
+        anchor={
+          <TouchableOpacity onPress={toggleMenu} activeOpacity={0.7}>
+            <MaterialIcons
+              name={'menu' + (menuVisible ? '-open' : '')}
+              color={Styles.themeColor.color}
+              size={35}
+            />
+          </TouchableOpacity>
+        }>
+        {contextDetails['Name'] && (
+          <MenuItem
+            onPress={() => {
+              hideMenu();
+            }}>
+            {contextDetails['Name']}
+          </MenuItem>
+        )}
+        <MenuItem
+          onPress={() => {
+            hideMenu();
+            AsyncStorage.removeItem('logInDetails');
+            setContextDetails({isAuthenticated: false});
+          }}>
+          Logout
+        </MenuItem>
+        <MenuItem
+          onPress={() => {
+            hideMenu();
+          }}>
+          Close
+        </MenuItem>
+      </Menu>
+    </View>
+  );
+};
+
 const screenOptions = {
   headerShown: false,
-  // tabBarActiveTintColor: Styles['themeColor']['color'],
   tabBarStyle: {backgroundColor: '#ffffff'},
   tabBarInactiveTintColor: '#000000',
   tabBarLabelStyle: {fontSize: 12},
@@ -32,6 +92,51 @@ export default function App() {
     isAdmin: false,
     Path: 'SignIn',
   });
+
+  if (userDetails['isAuthenticated']) {
+    screenOptions['header'] = () => (
+      <View
+        style={{
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          paddingVertical: 5,
+          paddingHorizontal: 10,
+          backgroundColor: '#ffffff',
+          borderBottomWidth: 1,
+        }}>
+        <View
+          style={{
+            flexDirection: 'row',
+            display: 'flex',
+            alignItems: 'flex-end',
+            display: 'flex',
+            flex: 1,
+            position: 'relative',
+          }}>
+          <Image
+            source={require('./Src/assets/AB-Logo.png')}
+            alt="AB Logo"
+            style={{
+              width: 30,
+              height: 30,
+            }}
+          />
+          <Text
+            style={{
+              fontSize: 25,
+              color: Styles.themeColor.color,
+              fontWeight: 'bold',
+              marginLeft: 10,
+            }}>
+            Analytic Brains
+          </Text>
+        </View>
+        <MenuButton />
+      </View>
+    );
+  }
+  screenOptions['headerShown'] = userDetails['isAuthenticated'];
 
   return (
     <UserContext.Provider

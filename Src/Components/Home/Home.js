@@ -5,7 +5,9 @@ import {
   Text,
   ScrollView,
   RefreshControl,
+  Image,
 } from 'react-native';
+import base64js from 'base64-js';
 import {
   Button,
   DatePicker,
@@ -29,6 +31,13 @@ import AntDesign from 'react-native-vector-icons/AntDesign';
 
 import moment from 'moment';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
+
+import {
+  ALERT_TYPE,
+  AlertNotificationRoot,
+  Dialog,
+} from 'react-native-alert-notification';
+import PDFViewer from '../Accessories/PDFViewer';
 
 const ActionButton = ({onPress, text, iconName = '', type = ''}) => {
   return (
@@ -73,6 +82,10 @@ const Home = props => {
     paidBy: null,
     invoiceFiles: [],
   });
+  const [pdfViewerDetails, setPdfViewerDetails] = useState({
+    isVisible: false,
+    pdfUrl: '',
+  });
 
   const [paymentDetails, setPaymentDetails] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
@@ -91,7 +104,7 @@ const Home = props => {
 
     if (date) {
       const result = await handleAPI('getPaymentDetails', {
-        date: moment(date).format('DD/MM/YYYY'),
+        date: moment(date).format('YYYY-MM-DD'),
         userId,
         isAdmin,
       });
@@ -128,7 +141,7 @@ const Home = props => {
       let iPaymentDetails = paymentDetails,
         {amount, purpose, invoiceFiles = [], paidBy, _id} = newPaymentDetails,
         invoiceDetails =
-          isUpdate !== 'addInvoice'
+          isUpdate === 'addInvoice'
             ? await handleAPI('storeInvoice', {
                 file: invoiceFiles.filter(({isSaved}) => !isSaved),
               })
@@ -140,12 +153,11 @@ const Home = props => {
         purpose,
         // invoice: [...(invoiceFiles || []), ...(invoiceDetails["data"] || [])],
         invoiceFiles:
-          isUpdate !== 'addInvoice'
+          isUpdate === 'addInvoice'
             ? [...invoiceFiles.map(({fileName}) => ({fileName}))]
             : invoiceDetails?.['data'] || [],
         paidBy,
-        date1: moment(new Date(dateDetails['date'])).format('YYYY-MM-DD'),
-        date: new Date(dateDetails['date']),
+        date: moment(new Date(dateDetails['date'])).format('YYYY-MM-DD'),
         addedDate: moment(new Date()).format('DD/MM/YYYY'),
         _id,
       };
@@ -230,12 +242,47 @@ const Home = props => {
     }
   };
 
+  const handleViewInvoice = async fileName => {
+    handleAPI(
+      'getInvoice',
+      {
+        fileName,
+      },
+      {
+        responseType: 'arraybuffer',
+      },
+    )
+      .then(function (response) {
+        const firstBytes = new Uint8Array(response.data).slice(0, 10);
+        console.log('First few bytes of the image data:', firstBytes);
+
+        const base64Image = `data:image/jpeg;base64,${base64js.fromByteArray(
+          new Uint8Array(response.data),
+        )}`;
+
+        setPdfViewerDetails({
+          isVisible: true,
+          url: base64Image,
+          fileName,
+        });
+      })
+      .catch(error => {
+        console.error('Error form getInvoice ====> ', error);
+      });
+  };
+
   return (
     <>
+      <PDFViewer
+        headerText={pdfViewerDetails['fileName']}
+        isVisible={pdfViewerDetails['isVisible']}
+        url={pdfViewerDetails['url']}
+        onClose={() => setPdfViewerDetails({isVisible: false})}
+      />
       <View
         style={{
           ...Styles.loginContainer,
-          ...{top: 0, flex: 1, marginHorizontal: 10},
+          ...{top: 0, flex: 1},
         }}>
         <TouchableOpacity
           activeOpacity={1}
@@ -471,7 +518,9 @@ const Home = props => {
                               const {fileName} = file;
                               return (
                                 <Text
-                                  onPress={() => {}}
+                                  onPress={() => {
+                                    handleViewInvoice(fileName);
+                                  }}
                                   key={fileName}
                                   style={{
                                     fontSize: 9,
@@ -590,22 +639,28 @@ const Home = props => {
             </ScrollView>
           </>
         ) : (
-          <View
-            style={{
-              width: '100%',
-            }}>
+          <ScrollView
+            showsVerticalScrollIndicator={false}
+            refreshControl={
+              <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+            }>
             <View
               style={{
-                marginHorizontal: 20,
-                marginVertical: 25,
-                borderRadius: 5,
-                padding: 5,
-                backgroundColor: '#f5dade',
-                alignItems: 'center',
+                width: '100%',
               }}>
-              <Text style={{fontSize: 13}}>No Payment's found</Text>
+              <View
+                style={{
+                  marginHorizontal: 20,
+                  marginVertical: 25,
+                  borderRadius: 5,
+                  padding: 5,
+                  backgroundColor: '#f5dade',
+                  alignItems: 'center',
+                }}>
+                <Text style={{fontSize: 13}}>No Payment's found</Text>
+              </View>
             </View>
-          </View>
+          </ScrollView>
         )}
       </View>
 
@@ -686,6 +741,9 @@ const Home = props => {
                       flexDirection: 'row',
                       borderWidth: 1,
                       borderRadius: 3,
+                    }}
+                    onPress={() => {
+                      handleViewInvoice(fileName);
                     }}>
                     <Text
                       key={index}
@@ -792,8 +850,6 @@ const Home = props => {
                 },
               ]}
               onPress={() => {
-                console.log(newPaymentDetails?.index);
-
                 handleAddPayment(
                   newPaymentDetails?.isUpdate,
                   newPaymentDetails?.index ?? -1,

@@ -3,12 +3,16 @@ import {android, ios, web} from './Accessories/Platform';
 import axios from 'axios';
 import {NODE_URI, NODE_URI_PROD} from '@env';
 const {log, error} = console;
-const handleAPI = async (name, params) => {
+const handleAPI = async (name, params, options = {}) => {
   try {
     let iNodeUri = __DEV__ ? NODE_URI : NODE_URI_PROD;
     // iNodeUri = 'http://localhost:4440';
-    console.log('Calling API', iNodeUri + '/' + name);
-    const response = await axios.post(`${iNodeUri}/${name}`, params || {});
+    // console.log('Calling API', iNodeUri + '/' + name);
+    const response = await axios.post(
+      `${iNodeUri}/${name}`,
+      params || {},
+      options,
+    );
     return response;
   } catch (err) {
     return error(`Error from ${name} ===> `, err);
@@ -44,7 +48,7 @@ const handleGetStoredCredential = async (key, userDetails) => {
 const handleSetStoredCredential = (isClear, key, iUserDetails) => {
   //Storing required details for auto redirecting
   if (iUserDetails && iUserDetails['staySignedIn'] && !isClear) {
-    let {Id, Name, userName} = iUserDetails,
+    let {Id, Name, userName, isSuperAdmin, isAdmin} = iUserDetails,
       date = new Date();
     date.setDate(date.getDate() + 30);
 
@@ -55,6 +59,8 @@ const handleSetStoredCredential = (isClear, key, iUserDetails) => {
       AutoRedirectExpiryDate: date.getTime(),
       staySignedIn: true,
       autoDirect: true,
+      isSuperAdmin,
+      isAdmin,
     });
     AsyncStorage.removeItem(key);
     AsyncStorage.setItem(key, objectToStore);

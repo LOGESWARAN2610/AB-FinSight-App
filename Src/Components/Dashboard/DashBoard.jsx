@@ -25,7 +25,7 @@ import {
   useMemo,
   useState,
 } from 'react';
-
+import base64js from 'base64-js';
 import {
   DatePicker,
   DrawerView,
@@ -37,6 +37,7 @@ import moment from 'moment';
 import Entypo from 'react-native-vector-icons/Entypo';
 
 import AntDesign from 'react-native-vector-icons/AntDesign';
+import PDFViewer from '../Accessories/PDFViewer';
 
 const pastMonthArray = getPastMonthsArray(),
   weeksArray = [{label: 'All', value: 0}, ...getWeeksArray()];
@@ -46,8 +47,8 @@ const TotalSummary = ({amountDetails}) => {
     <View style={{flexDirection: 'row'}}>
       <View
         style={{
-          paddingVertical: 15,
-          paddingHorizontal: 20,
+          paddingVertical: 10,
+          paddingHorizontal: 15,
           borderRadius: 5,
           marginVertical: 10,
           backgroundColor: Styles.themeColor.color,
@@ -99,7 +100,10 @@ const TransactionHistory = ({
   isAdmin = false,
 }) => {
   const [invoiceViewIndex, setInvoiceViewIndex] = useState([]);
-
+  const [pdfViewerDetails, setPdfViewerDetails] = useState({
+    isVisible: false,
+    pdfUrl: '',
+  });
   const handleToggleDatePicker = dateFor => {
     setControlDetails(prevDateDetails => {
       return {
@@ -120,7 +124,34 @@ const TransactionHistory = ({
       };
     });
   };
+  const handleViewInvoice = async fileName => {
+    handleAPI(
+      'getInvoice',
+      {
+        fileName,
+      },
+      {
+        responseType: 'arraybuffer',
+      },
+    )
+      .then(function (response) {
+        const firstBytes = new Uint8Array(response.data).slice(0, 10);
+        console.log('First few bytes of the image data:', firstBytes);
 
+        const base64Image = `data:image/jpeg;base64,${base64js.fromByteArray(
+          new Uint8Array(response.data),
+        )}`;
+
+        setPdfViewerDetails({
+          isVisible: true,
+          url: base64Image,
+          fileName,
+        });
+      })
+      .catch(error => {
+        console.error('Error form getInvoice ====> ', error);
+      });
+  };
   const iTransactionHistory = useMemo(() => {
     return controlDetails['filterBy'] === 'All'
       ? transactionHistory
@@ -166,6 +197,12 @@ const TransactionHistory = ({
 
   return (
     <>
+      <PDFViewer
+        headerText={pdfViewerDetails['fileName']}
+        isVisible={pdfViewerDetails['isVisible']}
+        url={pdfViewerDetails['url']}
+        onClose={() => setPdfViewerDetails({isVisible: false})}
+      />
       <View>
         <View
           style={{
@@ -193,44 +230,9 @@ const TransactionHistory = ({
             style={{
               borderRadius: 5,
               flexDirection: 'row',
+              alignItems: 'flex-end',
               justifyContent: 'space-between',
             }}>
-            {/* <Dropdown
-              shadow={false}
-              fontSize={11}
-              style={{ paddingVertical: 0, width: 80 }}
-              options={pastMonthArray}
-              placeholder="Select"
-              valueObj={viewMonth}
-              onChange={(value) => {
-                handleInputDetails({ name: "viewMonth", value });
-              }}
-            /> */}
-            {/* <Dropdown
-              fontSize={11}
-              shadow={false}
-              style={{ paddingVertical: 0, width: 90 }}
-              options={[
-                { label: "Weekly", value: 2 },
-                { label: "Daily", value: 1 },
-              ]}
-              placeholder="Select"
-              valueObj={viewMode}
-              onChange={(value) => {
-                handleInputDetails({ name: "viewMode", value });
-              }}
-            /> */}
-            {/* <Dropdown
-              fontSize={11}
-              shadow={false}
-              style={{ paddingVertical: 0, width: 80 }}
-              options={weeklyDailyOptions}
-              placeholder="Select"
-              valueObj={viewValue}
-              onChange={(value) => {
-                handleInputDetails({ name: "viewValue", value });
-              }}
-            /> */}
             <TouchableOpacity
               style={{
                 flexDirection: 'row',
@@ -365,7 +367,9 @@ const TransactionHistory = ({
                             const {fileName} = file;
                             return (
                               <Text
-                                onPress={() => {}}
+                                onPress={() => {
+                                  handleViewInvoice(fileName);
+                                }}
                                 key={fileName}
                                 style={{
                                   fontSize: 9,
@@ -847,7 +851,7 @@ const DashBoard = props => {
   }, [controlDetails['from'], controlDetails['to']]);
 
   return (
-    <View style={{paddingHorizontal: 20, backgroundColor: '#fff', flex: 1}}>
+    <View style={{paddingHorizontal: 10, backgroundColor: '#fff', flex: 1}}>
       <TotalSummary amountDetails={totalSummaryDetails} />
       <ScrollView
         showsVerticalScrollIndicator={false}

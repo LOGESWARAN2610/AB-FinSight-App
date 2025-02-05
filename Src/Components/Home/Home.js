@@ -51,6 +51,11 @@ const ActionButton = ({onPress, text, iconName = '', type = ''}) => {
           borderRadius: 25,
           flexDirection: 'row',
           borderWidth: 1,
+          alignSelf: 'center',
+          display: 'flex',
+          alignContent: 'center',
+          justifyContent: 'center',
+          alignItems: 'center',
         },
       ]}>
       <Text
@@ -70,7 +75,7 @@ const Home = props => {
   const {navigation} = props;
   const {contextDetails, setContextDetails} = useContext(UserContext);
 
-  const {isAdmin = false, userId} = contextDetails;
+  const {isAdmin = false, userId, isSuperAdmin = false} = contextDetails;
   const [dateDetails, setDateDetails] = useState({
     isVisible: false,
     date: new Date(),

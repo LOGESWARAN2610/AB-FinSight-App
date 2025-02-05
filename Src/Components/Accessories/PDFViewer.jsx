@@ -59,10 +59,14 @@ const PDFViewer = ({
           onPress={() => onClose()}
           style={{
             justifyContent: 'space-between',
-            paddingTop: 15,
-            paddingHorizontal: 10,
+            paddingVertical: 15,
+            // paddingHorizontal: 10,
             marginBottom: 15,
+            marginHorizontal: 10,
             flexDirection: 'row',
+            backgroundColor: '#ffffff',
+            borderBottomWidth: 1,
+            borderColor: '#999',
           }}>
           <Text style={{fontSize: 16, fontWeight: 'bold'}}>{headerText}</Text>
           <FontAwesome
@@ -71,7 +75,6 @@ const PDFViewer = ({
             style={{
               color: 'red',
               marginBottom: 0,
-              marginRight: 5,
             }}
           />
         </TouchableOpacity>
@@ -86,11 +89,22 @@ const PDFViewer = ({
             <Image
               source={source}
               style={{
-                width: '100%', // make the image width fill the screen
+                width: '100%',
                 height: null,
-                aspectRatio: 1, // maintain the aspect ratio of the image
+                aspectRatio: 0.5,
+                borderWidth: 1,
+                borderRadius: 5,
+                borderColor: '#999',
               }}
             />
+            <View
+              style={{
+                marginVertical: 15,
+                borderColor: '#999',
+                borderBottomWidth: 1,
+                borderColor: '#999',
+                width: '100%',
+              }}></View>
           </ScrollView>
         </View>
       </View>

@@ -48,7 +48,7 @@ const handleGetStoredCredential = async (key, userDetails) => {
 const handleSetStoredCredential = (isClear, key, iUserDetails) => {
   //Storing required details for auto redirecting
   if (iUserDetails && iUserDetails['staySignedIn'] && !isClear) {
-    let {Id, Name, userName, isSuperAdmin, isAdmin} = iUserDetails,
+    let {Id, Name, userName, isSuperAdmin, isAdmin, userId} = iUserDetails,
       date = new Date();
     date.setDate(date.getDate() + 30);
 
@@ -61,6 +61,7 @@ const handleSetStoredCredential = (isClear, key, iUserDetails) => {
       autoDirect: true,
       isSuperAdmin,
       isAdmin,
+      userId,
     });
     AsyncStorage.removeItem(key);
     AsyncStorage.setItem(key, objectToStore);

@@ -751,7 +751,7 @@ const DashBoard = props => {
     const {endDate: wEndDate, startDate: wStartDate} = getCurrentWeekDates(),
       {endDate: mEndDate, startDate: mStartDate} = getFirstAndLastDateOfMonth(),
       toDayDetails = await handleAPI('getPaymentDetails', {
-        date: moment(new Date()).format('DD/MM/YYYY'),
+        date: moment(new Date()).format('YYYY-MM-DD'),
         userId,
         isAdmin,
       }),

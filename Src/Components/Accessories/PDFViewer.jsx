@@ -85,7 +85,10 @@ const PDFViewer = ({
             maximumZoomScale={3}
             minimumZoomScale={1}
             showsVerticalScrollIndicator={false}
-            showsHorizontalScrollIndicator={false}>
+            showsHorizontalScrollIndicator={false}
+            style={{
+              borderRadius: 5,
+            }}>
             <Image
               source={source}
               style={{
@@ -119,6 +122,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     height: Dimensions.get('window').height,
     paddingHorizontal: 10,
+    marginBottom: 10,
   },
   scrollContainer: {
     flexDirection: 'column',
